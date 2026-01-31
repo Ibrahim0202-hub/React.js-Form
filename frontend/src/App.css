@@ -1,0 +1,27 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.App {
+  width: 300px;
+  margin: 50px auto;
+}
+
+h2 {
+  text-align: center;
+}
+
+input,
+textarea,
+button {
+  width: 100%;
+  padding: 8px;
+}
+
+button {
+  cursor: pointer;
+}
+
+p {
+  text-align: center;
+}
