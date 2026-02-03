@@ -1,54 +1,68 @@
 import { useState } from "react";
+import { Form, Input, Button, message as antdMessage } from "antd";
 import "./App.css";
 
 function App() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [responseMessage, setResponseMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onFinish = (values) => {
+    setLoading(true);
 
     fetch("http://localhost:3000/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, message })
+      body: JSON.stringify(values),
     })
-      .then(res => res.json())
-      .then(data => setResponseMessage(data.message))
-      .catch(() => setResponseMessage("Error submitting form"));
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          antdMessage.success(data.message);
+        } else {
+          antdMessage.error(data.message);
+        }
+      })
+      .catch(() => {
+        antdMessage.error("Server error");
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div className="App">
+    <div className="App" style={{ padding: 40 }}>
       <h2>Contact Form</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <Form layout="vertical" onFinish={onFinish}>
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "Please enter your name" }]}
+        >
+          <Input placeholder="Enter your name" />
+        </Form.Item>
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true, message: "Please enter your email" },
+            { type: "email", message: "Enter a valid email" },
+          ]}
+        >
+          <Input placeholder="Enter your email" />
+        </Form.Item>
 
-        <textarea
-          placeholder="Enter your message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
+        <Form.Item
+          label="Message"
+          name="message"
+          rules={[{ required: true, message: "Please enter your message" }]}
+        >
+          <Input.TextArea rows={4} placeholder="Enter your message" />
+        </Form.Item>
 
-        <button type="submit">Submit</button>
-      </form>
-
-      <p>{responseMessage}</p>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          Submit
+        </Button>
+      </Form>
     </div>
   );
 }
